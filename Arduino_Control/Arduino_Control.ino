@@ -278,6 +278,6 @@ motor1.setSpeed(speed);
 
 motor2.setSpeed(speed);
 
-//delay(30); //-> 추후 줄여야함
+delay(100); //-> 추후 줄여야함
 
 }

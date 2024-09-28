@@ -8,9 +8,8 @@ from std_msgs.msg import Float32MultiArray
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import NavSatFix
 from nav_msgs.msg import Odometry
-from pyproj import Proj
 from math import pi
-
+from pyproj import Proj
 
 class GPSIMUParser:
     def __init__(self):

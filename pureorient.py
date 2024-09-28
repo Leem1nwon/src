@@ -25,12 +25,15 @@ class pure_pursuit:
         self.is_odom = False
         self.is_index = False
 
+        # self.initial_yaw_offset = None
+        # self.heading = None # yaw_heading_cal.py d
+
         self.forward_point = Point()
         self.current_position = Point()
         self.current_waypoint = Int16()
         self.is_look_forward_point = False
         self.vehicle_length = 0.68
-        self.lfd = 3
+        self.lfd = 5
         self.steering = 0
         self.velocity = 0
         self.pwm = 0
@@ -41,9 +44,9 @@ class pure_pursuit:
 
         self.parking_manager = ParkingManager()  # 주차 매니저 인스턴스 생성
 
-        PARKING_PLACE_1 = 1
-        PARKING_PLACE_2 = 2
-        PARKING_PLACE_3 = 3
+        PARKING_PLACE_1 = -1
+        PARKING_PLACE_2 = -1
+        PARKING_PLACE_3 = -1
 
 
         rate = rospy.Rate(20)  # 30hz
@@ -82,20 +85,23 @@ class pure_pursuit:
                         path_point = waypoint.pose.position
                         global_path_point = [path_point.x, path_point.y, 1]
                         local_path_point = det_t.dot(global_path_point)
-                        # print(local_path_point[0])
+                        print(local_path_point[0])
 
-                        if local_path_point[0] != 0:
-                            dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
-                            if i == 0 or dis >= self.lfd:
-                                self.forward_point = path_point
-                                self.is_look_forward_point = True
-                                break
-
+                        # if local_path_point[0] != 0:
+                        dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
+                        if dis >= self.lfd:
+                            # self.forward_point = path_point
+                            self.is_look_forward_point = True
+                            print(f"Looking Index : {i}")
+                            break
+                        
                     theta = atan2(local_path_point[1], local_path_point[0])
 
+                    print (f"is_look_forward_point : {self.is_look_forward_point}")
+
                     if self.is_look_forward_point:
-                        # 속도 공식 : ks(상수) * base speed
-                        base_speed = 20
+                        # 속도 공식 : ks(상수) * base speedis_look
+                        base_speed = 6
                         ks = 1 - 0.3 * (abs(self.steering) / 30) # 30도를 최대 steering각이라 했을 때 30퍼까지 감속되게
                         self.velocity = ks * base_speed
 
@@ -113,23 +119,26 @@ class pure_pursuit:
                         average_steering = sum(self.steering_buffer) / len(self.steering_buffer)
                         self.steering = self.apply_steering_threshold(average_steering)
 
-                        print('Steering : ',self.steering, end="")
-                        print('    /    PWM : ',self.pwm)
                     else :
                         rospy.logwarn("No found forward point")
                         self.steering = 0.0
                         self.velocity = max(0.0, self.velocity - 0.1)
 
                 
-                # self.pwm = int(self.velocity / 6)
-                self.pwm = min(20, max(-20, self.pwm))
-                self.steering = int(min(30, max(-30, self.steering)))
-                print(self.steering)
+                self.pwm = 6*int(self.velocity)
+                self.pwm = min(50, max(-50, self.pwm))
+                self.steering = -int(min(30, max(-30, self.steering)))
+                # print(self.steering)
+                print('Steering : ',self.steering, end="")
+                print('    /    PWM : ',self.pwm)
                 self.steering_pub.publish(self.steering)
                 self.velocity_pub.publish(self.velocity)
                 self.pwm_pub.publish(self.pwm)
 
-                self.is_path = self.is_index = self.is_odom = self.is_look_forward_point = False
+                self.is_path = False
+                self.is_index = False
+                self.is_odom = False
+                self.is_look_forward_point = False
 
             elif not self.is_path:
                 rospy.logwarn("Path received Fail")
