@@ -69,7 +69,7 @@ class GPSIMUParser:
             self.odom_msg.pose.pose.position.z = 0.
 
     def imu_callback(self, data):
-        if data.orientation.w == 0:
+        if False: #data.orientation.w == 0:
             self.odom_msg.pose.pose.orientation.y = 0.0
             self.odom_msg.pose.pose.orientation.z = 0.0
             self.odom_msg.pose.pose.orientation.w = 1.0

@@ -3,7 +3,7 @@ import time
 from pynput import keyboard
 
 # 시리얼 포트 설정 (포트 이름은 자신의 환경에 맞게 수정)
-ser = serial.Serial('/dev/ttyACM1', 9600, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 time.sleep(2)  # Arduino와 통신 준비 시간을 위한 딜레이
 
 # 플래그 변수

@@ -33,7 +33,7 @@ class pure_pursuit:
         self.current_waypoint = Int16()
         self.is_look_forward_point = False
         self.vehicle_length = 0.68
-        self.lfd = 5
+        self.lfd = 2
         self.steering = 0
         self.velocity = 0
         self.pwm = 0
@@ -69,27 +69,28 @@ class pure_pursuit:
                     [0, 0, 1]])
 
                 # 주차 구역에 최초로 진입했을 때
-                if not self.parking_manager.is_parking and (current_index == PARKING_PLACE_1 or current_index == PARKING_PLACE_2 or current_index == PARKING_PLACE_3):
-                    if current_index == PARKING_PLACE_1:
-                        self.parking_manager.start_parking(1)
-                    elif current_index == PARKING_PLACE_2:
-                        self.parking_manager.start_parking(2)
+                # if not self.parking_manager.is_parking and (current_index == PARKING_PLACE_1 or current_index == PARKING_PLACE_2 or current_index == PARKING_PLACE_3):
+                #     if current_index == PARKING_PLACE_1:
+                #         self.parking_manager.start_parking(1)
+                #     elif current_index == PARKING_PLACE_2:
+                #         self.parking_manager.start_parking(2)
                     
-                # 주차 중일 때
-                if self.parking_manager.is_parking:
-                    self.steering, self.velocity = self.parking_manager.update_parking()
+                # # 주차 중일 때
+                # if self.parking_manager.is_parking:
+                #     self.steering, self.velocity = self.parking_manager.update_parking()
 
-                if self.parking_manager.is_parking == False:   # 주차 끝내고 parking.reset_parking() 으로 주차모드 해제된 직후에도 purpusuit 위해 elif 말고 그냥if 사용
+                if 1:#self.parking_manager.is_parking == False:   # 주차 끝내고 parking.reset_parking() 으로 주차모드 해제된 직후에도 purpusuit 위해 elif 말고 그냥if 사용
                     # 일반 주행 (Pure Pursuit)
                     for i, waypoint in enumerate(self.path.poses):
+                        print(self.path.poses)
                         path_point = waypoint.pose.position
                         global_path_point = [path_point.x, path_point.y, 1]
                         local_path_point = det_t.dot(global_path_point)
-                        print(local_path_point[0])
+                        # print(local_path_point[0])
 
                         # if local_path_point[0] != 0:
                         dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
-                        if dis >= self.lfd:
+                        if  i>= current_index and dis >= self.lfd:
                             # self.forward_point = path_point
                             self.is_look_forward_point = True
                             print(f"Looking Index : {i}")
@@ -127,7 +128,7 @@ class pure_pursuit:
                 
                 self.pwm = 6*int(self.velocity)
                 self.pwm = min(50, max(-50, self.pwm))
-                self.steering = -int(min(30, max(-30, self.steering)))
+                self.steering = -int(min(30, max(-30, self.steering*4)))
                 # print(self.steering)
                 print('Steering : ',self.steering, end="")
                 print('    /    PWM : ',self.pwm)

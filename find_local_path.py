@@ -11,6 +11,8 @@ from geometry_msgs.msg import PoseStamped
 from path_reader_1 import pathReader
 from std_msgs.msg import Int16
 from math import degrees, atan2
+import utm
+
 
 # global_path와 turtle의 status_msg 이용해 현재 waypoint와 local_path 생성
 def find_local_path(ref_path, current_position, index):
@@ -32,7 +34,8 @@ def find_local_path(ref_path, current_position, index):
         dls = sqrt(pow(dx, 2) + pow(dy, 2))
         if dls < min_dls:
             min_dls = dls
-            current_waypoint = i    
+            current_waypoint = i   
+        print(current_waypoint) 
 
     out_path.header.frame_id = 'map'
     for i in range(current_waypoint, last_local_waypoint):
@@ -48,37 +51,11 @@ def find_local_path(ref_path, current_position, index):
 
     return out_path, current_waypoint
 
-# class ego_listener():
-#     def __init__(self):        
-#         rospy.Subscriber("/odom", Odometry, self.odom_callback)  # Odometry 데이터를 구독
-#         self.current_position = [0.0, 0.0]
-#         self.yaw = 0.0
-
-#     def odom_callback(self, data):
-#         # Odometry 메시지에서 현재 위치와 방향 정보 가져오기
-#         self.current_position = [data.pose.pose.position.x, data.pose.pose.position.y]
-
-#         # Orientation에서 Yaw 값 추출
-#         orientation_q = data.pose.pose.orientation
-#         _, _, self.yaw = tf.transformations.euler_from_quaternion(
-#             [orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w])
-
-#         # TF 전송: 현재 위치와 방향(yaw)
-#         br = tf.TransformBroadcaster()
-#         br.sendTransform((self.current_position[0], self.current_position[1], 0),
-#                         tf.transformations.quaternion_from_euler(0, 0, self.yaw),
-#                         rospy.Time.now(),
-#                         "ego",
-#                         "map")
-
 class ego_listener():
-    def __init__(self, initial_heading):
+    def __init__(self):        
         rospy.Subscriber("/odom", Odometry, self.odom_callback)  # Odometry 데이터를 구독
         self.current_position = [0.0, 0.0]
         self.yaw = 0.0
-        self.initial_yaw_offset = 0
-        self.initial_heading = initial_heading  # 초기 방향 저장
-
     def odom_callback(self, data):
         # Odometry 메시지에서 현재 위치와 방향 정보 가져오기
         self.current_position = [data.pose.pose.position.x, data.pose.pose.position.y]
@@ -100,16 +77,6 @@ class ego_listener():
                         "map")
 
         
-
-# class PathSubscriber:
-#     def __init__(self):
-#         self.global_path = Path()
-#         self.is_path_received = False
-#         rospy.Subscriber("/global_path", Path, self.global_path_callback)
-
-#     def global_path_callback(self, msg):
-#         self.global_path = msg
-#         self.is_path_received = True
 
 class PathSubscriber:
     def __init__(self):
@@ -139,17 +106,14 @@ class PathSubscriber:
         self.initial_heading = self.calculate_initial_heading(first_point, second_point)
         rospy.loginfo(f"Initial heading from global path: {self.initial_heading} degrees")
 
-
-
 if __name__ == '__main__':
     try: 
         rospy.init_node('local_path_finder', anonymous=True)
         local_path_pub = rospy.Publisher('/local_path', Path, queue_size=1)
         current_index_pub = rospy.Publisher('/current_waypoint', Int16, queue_size=1)
+        el = ego_listener()
 
         path_sub = PathSubscriber()  # Create an instance of the PathSubscriber class
-        el = ego_listener(path_sub.initial_heading)
-
         current_waypoint = 0
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
@@ -161,9 +125,9 @@ if __name__ == '__main__':
                 local_path_pub.publish(local_path)
                 current_index_pub.publish(index_msg)
 
-        else:
-            rospy.logwarn("Global path has not been received yet. Waiting for the /global_path topic to publish data...")
-            rate.sleep()
+            else:
+                rospy.logwarn("Global path has not been received yet. Waiting for the /global_path topic to publish data...")
+                rate.sleep()
         
 
     except rospy.ROSInterruptException:
