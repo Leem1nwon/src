@@ -15,8 +15,8 @@ CytronMD motor3(PWM_DIR, pwmPin_s, dirPin_s);
 void controlDriveMotor(char command) {
   if (command == 'W') {
     // 전진
-    motor1.setSpeed(70);
-    motor2.setSpeed(70);
+    motor1.setSpeed(100);
+    motor2.setSpeed(100);
   }else if (command == 'X') {
     // 오른쪽 앞으로 (오른쪽 모터를 더 느리게, 왼쪽 모터는 정상 속도)
     motor1.setSpeed(-30);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
@@ -28,12 +28,12 @@ void controlDriveMotor(char command) {
     motor2.setSpeed(0);
   } else if (command == 'F') {
     // 왼쪽 앞으로 (왼쪽 모터를 더 느리게, 오른쪽 모터는 정상 속도)
-    motor1.setSpeed(70);
-    motor2.setSpeed(70);  // 왼쪽 모터를 더 느리게 하여 왼쪽으로 회전
+    motor1.setSpeed(100);
+    motor2.setSpeed(100);  // 왼쪽 모터를 더 느리게 하여 왼쪽으로 회전
   } else if (command == 'G') {
     // 오른쪽 앞으로 (오른쪽 모터를 더 느리게, 왼쪽 모터는 정상 속도)
-    motor1.setSpeed(70);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
-    motor2.setSpeed(70);
+    motor1.setSpeed(100);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
+    motor2.setSpeed(100);
   }else if (command == 'H') {
     // 오른쪽 앞으로 (오른쪽 모터를 더 느리게, 왼쪽 모터는 정상 속도)
     motor1.setSpeed(-30);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전

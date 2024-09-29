@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
     std::string port;
     int baudrate;
 
-    nh.param<std::string>("port", port, "/dev/ttyUSB0");
+    nh.param<std::string>("port", port, "/dev/ttyUSB1");
     nh.param("baudrate", baudrate, 115200);
 
     if(!m_e2box_imu.serial.Open(const_cast<char*>(port.c_str()), baudrate)){

@@ -55,7 +55,7 @@ class pathMaker:
         self.y_new = y
         distance = sqrt(pow(x-self.prev_x,2)+pow(y-self.prev_y,2))
         #이전 waypoint와 거리가 1.0 이상이면 기록
-        if distance > 0.5:
+        if distance > 0.1:
             data='{0}\t{1}\n'.format(self.x_new,self.y_new)
             self.f.write(data)
             self.prev_x = x

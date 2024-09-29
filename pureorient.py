@@ -32,8 +32,8 @@ class pure_pursuit:
         self.current_position = Point()
         self.current_waypoint = Int16()
         self.is_look_forward_point = False
-        self.vehicle_length = 0.68
-        self.lfd = 2
+        self.vehicle_length = 4.5
+        self.lfd = 2.0
         self.steering = 0
         self.velocity = 0
         self.pwm = 0
@@ -90,7 +90,7 @@ class pure_pursuit:
 
                         # if local_path_point[0] != 0:
                         dis = sqrt(pow(local_path_point[0], 2) + pow(local_path_point[1], 2))
-                        if  i>= current_index and dis >= self.lfd:
+                        if  i!=0 and dis >= self.lfd:
                             # self.forward_point = path_point
                             self.is_look_forward_point = True
                             print(f"Looking Index : {i}")
@@ -109,7 +109,7 @@ class pure_pursuit:
                         # self.lfd = 2.8 + (self.velocity - 7) / 5 # 속도에 따라서 lfd 거리 조절하기
                         print('Self.lfd : ', self.lfd)
 
-                        raw_steering_angle = atan2((2 * self.vehicle_length * sin(theta)), self.lfd)*15 #* (4 / self.velocity)
+                        raw_steering_angle = atan2((2 * self.vehicle_length * sin(theta)), self.lfd)*5 #* (4 / self.velocity)
 
                         if len(self.steering_buffer) < self.steering_buffer_size:
                             self.steering_buffer.append(raw_steering_angle)
@@ -127,8 +127,8 @@ class pure_pursuit:
 
                 
                 self.pwm = 6*int(self.velocity)
-                self.pwm = min(50, max(-50, self.pwm))
-                self.steering = -int(min(30, max(-30, self.steering*4)))
+                self.pwm = min(60, max(-60, self.pwm*2))
+                self.steering = int(min(30, max(-30, self.steering*4)))
                 # print(self.steering)
                 print('Steering : ',self.steering, end="")
                 print('    /    PWM : ',self.pwm)
