@@ -33,7 +33,7 @@ class pure_pursuit:
         self.current_waypoint = Int16()
         self.is_look_forward_point = False
         self.vehicle_length = 4.5
-        self.lfd = 2.0
+        self.lfd = 4.0
         self.steering = 0
         self.velocity = 0
         self.pwm = 0

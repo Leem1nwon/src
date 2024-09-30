@@ -11,14 +11,20 @@ forward = False
 left = False
 right = False
 back = False
+fast_forward= False
 
 # 키보드 입력이 들어오면 해당 명령을 시리얼로 전송
 def on_press(key):
-    global forward, left, right, back
+    global forward, left, right, back, fast_forward
 
     try:
         if key.char == 'w':
             forward = True
+            back= False
+            update_movement()  # 상태 업데이트
+        if key.char == 'q':
+            fast_forward = True
+            forward=False
             back= False
             update_movement()  # 상태 업데이트
         elif key.char == 'a':
@@ -44,11 +50,14 @@ def on_press(key):
 
 # 키보드에서 키가 떼어지면 상태 업데이트
 def on_release(key):
-    global forward, left, right, back
+    global forward, left, right, back, fast_forward
 
     try:
         if key.char == 'w':
             forward = False
+            update_movement()  # 상태 업데이트
+        if key.char == 'q':
+            fast_forward = False
             update_movement()  # 상태 업데이트
         elif key.char == 'a':
             left = False
@@ -78,6 +87,15 @@ def update_movement():
     elif forward:
         ser.write(b'W')  # 전진
         print("Forward")
+    elif fast_forward and left:
+        ser.write(b'B')  # 왼쪽으로 전진 (약한 조향)
+        print("FAST Left")
+    elif fast_forward and right:
+        ser.write(b'N')  # 오른쪽으로 전진 (약한 조향)
+        print("FAST Right")
+    elif fast_forward:
+        ser.write(b'M')  # 전진
+        print("FAST")
     elif back and left:
         ser.write(b'H')  # 왼쪽으로 전진 (약한 조향)
         print("Back Left")

@@ -43,6 +43,21 @@ void controlDriveMotor(char command) {
     motor1.setSpeed(-30);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
     motor2.setSpeed(-30);
   }
+  else if (command == 'B') {
+    // 오른쪽 앞으로 (오른쪽 모터를 더 느리게, 왼쪽 모터는 정상 속도)
+    motor1.setSpeed(150);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
+    motor2.setSpeed(150);
+  }
+  else if (command == 'N') {
+    // 오른쪽 앞으로 (오른쪽 모터를 더 느리게, 왼쪽 모터는 정상 속도)
+    motor1.setSpeed(150);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
+    motor2.setSpeed(150);
+  }
+  else if (command == 'M') {
+    // 오른쪽 앞으로 (오른쪽 모터를 더 느리게, 왼쪽 모터는 정상 속도)
+    motor1.setSpeed(150);  // 오른쪽 모터를 더 느리게 하여 오른쪽으로 회전
+    motor2.setSpeed(150);
+  }
 }
 
 void setup() {
@@ -53,7 +68,7 @@ void loop() {
   if (Serial.available() > 0) {
     char input = Serial.read();
     
-    if (input == 'W' || input == 'F' || input == 'G' || input == 'S'|| input=='X') {
+    if (input == 'W' || input == 'F' || input == 'G' || input == 'S'|| input=='X' || input=='B' || input=='N' || input=='M') {
       controlDriveMotor(input);  // 이동 제어
     } else if (input == 'A') {
       motor3.setSpeed(-100);  // 왼쪽으로 조향
