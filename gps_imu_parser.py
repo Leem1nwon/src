@@ -22,7 +22,7 @@ class GPSIMUParser:
         
         # 초기화
         self.x, self.y = None, None
-        self.is_imu = True
+        self.is_imu = False
         self.is_gps = False
 
         self.proj_UTM = Proj(proj='utm', zone=52, ellps='WGS84', preserve_units=False)
@@ -37,8 +37,8 @@ class GPSIMUParser:
             if self.is_gps:
                 self.convertLL2UTM()
                 self.odom_pub.publish(self.odom_msg)
-                rospy.loginfo("odom_msg is now being published at '/odom' topic!")
-                rospy.loginfo('-----------------[ odom_msg ]---------------------')
+                # rospy.loginfo("odom_msg is now being published at '/odom' topic!")
+                # rospy.loginfo('-----------------[ odom_msg ]---------------------')
                 rospy.loginfo(self.odom_msg.pose)
             if not self.is_imu:
                 rospy.logwarn("[1] can't subscribe '/imu' topic... please check your IMU sensor connection")

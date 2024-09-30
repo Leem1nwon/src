@@ -13,9 +13,9 @@ from tf.transformations import euler_from_quaternion
 class pure_pursuit:
     def __init__(self):
         rospy.init_node('pure_pursuit', anonymous=True)
-        rospy.Subscriber("local_path", Path, self.path_callback)
-        rospy.Subscriber("odom", Odometry, self.odom_callback)
-        rospy.Subscriber("current_waypoint", Int16, self.index_callback)
+        rospy.Subscriber("/local_path", Path, self.path_callback)
+        rospy.Subscriber("/odom", Odometry, self.odom_callback)
+        rospy.Subscriber("/current_waypoint", Int16, self.index_callback)
 
         self.velocity_pub = rospy.Publisher('/velocity', Int16, queue_size=5)
         self.pwm_pub = rospy.Publisher('/pwm', Int16, queue_size=5)
@@ -32,8 +32,8 @@ class pure_pursuit:
         self.current_position = Point()
         self.current_waypoint = Int16()
         self.is_look_forward_point = False
-        self.vehicle_length = 4.5
-        self.lfd = 4.0
+        self.vehicle_length = 0.7 # 0.7m
+        self.lfd = 2.5 # 3m
         self.steering = 0
         self.velocity = 0
         self.pwm = 0
@@ -102,14 +102,16 @@ class pure_pursuit:
 
                     if self.is_look_forward_point:
                         # 속도 공식 : ks(상수) * base speedis_look
-                        base_speed = 6
+                        base_speed = 2.5 # m/s 
                         ks = 1 - 0.3 * (abs(self.steering) / 30) # 30도를 최대 steering각이라 했을 때 30퍼까지 감속되게
-                        self.velocity = ks * base_speed
+                        self.velocity = ks * base_speed # 1.75 ~ 2.5m/s 
+                        self.lfd = 1.5 * self.velocity # 차량 속력에 비례하여 lfd 조정. self.velocity가 코너 돌 때 줄어드므로 거기에 비례해서 같이 줄어들게 상수만 곱했음
 
                         # self.lfd = 2.8 + (self.velocity - 7) / 5 # 속도에 따라서 lfd 거리 조절하기
                         print('Self.lfd : ', self.lfd)
 
-                        raw_steering_angle = atan2((2 * self.vehicle_length * sin(theta)), self.lfd)*5 #* (4 / self.velocity)
+                        raw_steering_angle = atan2((2 * self.vehicle_length * sin(theta)), self.lfd) #* (4 / self.velocity)
+                        print('Raw_steering :',raw_steering_angle)
 
                         if len(self.steering_buffer) < self.steering_buffer_size:
                             self.steering_buffer.append(raw_steering_angle)
@@ -126,8 +128,8 @@ class pure_pursuit:
                         self.velocity = max(0.0, self.velocity - 0.1)
 
                 
-                self.pwm = 6*int(self.velocity)
-                self.pwm = min(60, max(-60, self.pwm*2))
+                self.pwm = 80*int(self.velocity)
+                self.pwm = min(60, max(-60, self.pwm))  # 경로 추종 성공 시 변경해야함
                 self.steering = int(min(30, max(-30, self.steering*4)))
                 # print(self.steering)
                 print('Steering : ',self.steering, end="")
@@ -141,12 +143,12 @@ class pure_pursuit:
                 self.is_odom = False
                 self.is_look_forward_point = False
 
-            elif not self.is_path:
-                rospy.logwarn("Path received Fail")
-            elif not self.is_odom:
-                rospy.logwarn("Odom received Fail")
-            elif not self.is_index:
-                rospy.logwarn("Index received Fail")
+            # elif not self.is_path:
+            #     rospy.logwarn("Path received Fail")
+            # elif not self.is_odom:
+            #     rospy.logwarn("Odom received Fail")
+            # elif not self.is_index:
+            #     rospy.logwarn("Index received Fail")
 
             rate.sleep()
 

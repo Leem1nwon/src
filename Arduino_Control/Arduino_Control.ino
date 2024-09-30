@@ -68,7 +68,7 @@ int potValue=centerPotValue;
 
 ros::NodeHandle nh;
 
-int angle, speed;
+int16_t angle, speed;
 
 // Configure the motor driver.
 
@@ -162,7 +162,7 @@ float Dout = Kd * derivative;
 
 float output = Pout + Iout + Dout;
 
-// 이전 값 갱신
+// 이전 값 갱신roslaunch ntrip_ros ntrip_ros.launch
 
 prevError = error;
 
